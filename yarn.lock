@@ -821,6 +821,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/roboto@npm:^5.0.8":
+  version: 5.0.8
+  resolution: "@fontsource/roboto@npm:5.0.8"
+  checksum: 10c0/da262037305145cc2a3b7f7c00066df72d4aa36d237001d7affce9390d16b3488eadaf0aa43a7ba86b3be8e310e3ae6823fa838365ee0e9a2e98a65e89e9d0f9
+  languageName: node
+  linkType: hard
+
 "@grpc/grpc-js@npm:~1.9.0":
   version: 1.9.14
   resolution: "@grpc/grpc-js@npm:1.9.14"
@@ -910,6 +917,22 @@ __metadata:
   version: 5.15.10
   resolution: "@mui/core-downloads-tracker@npm:5.15.10"
   checksum: 10c0/d05da33eb3532994aa0b71e8131c8c21b4c6256976bfa704b2268c2bd88ae2c6853b0832c2af904507820e56563d373020827310abd626e146e026200b76eacf
+  languageName: node
+  linkType: hard
+
+"@mui/icons-material@npm:^5.15.10":
+  version: 5.15.10
+  resolution: "@mui/icons-material@npm:5.15.10"
+  dependencies:
+    "@babel/runtime": "npm:^7.23.9"
+  peerDependencies:
+    "@mui/material": ^5.0.0
+    "@types/react": ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/d49747d962ad9dec172d498173ee60fe29f3c818d15458fdc21b5d7a1cfa3a5acf8c6f3e6e35c665a3b0f4a088ac6806601c0d408403117f6711740448db4346
   languageName: node
   linkType: hard
 
@@ -4490,6 +4513,8 @@ __metadata:
   dependencies:
     "@emotion/react": "npm:^11.11.3"
     "@emotion/styled": "npm:^11.11.0"
+    "@fontsource/roboto": "npm:^5.0.8"
+    "@mui/icons-material": "npm:^5.15.10"
     "@mui/material": "npm:^5.15.10"
     eslint: "npm:^8"
     eslint-config-next: "npm:14.1.0"

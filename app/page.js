@@ -1,19 +1,17 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-
+import Box from '@mui/material/Box';
 import InitFirebaseApp from '@/InitFirebaseApp';
+import RoomListContainer from '@/containers/RoomListContainer';
 
 export default function Home() {
   return (
-    <main className={styles.main}>
+    <Box component="main" height="100%" display="flex">
       <InitFirebaseApp />
+      <Box>
+        <RoomListContainer />
+      </Box>
+      <Box flex={1} minWidth={0}>
 
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-      </div>
-    </main>
+      </Box>
+    </Box>
   );
 }
