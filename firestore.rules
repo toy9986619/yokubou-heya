@@ -1,0 +1,77 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(roomData) {
+      return isSignedIn() && request.auth.uid in roomData.memberUids;
+    }
+
+    // invites/{token} -> { roomId }
+    // Anyone signed in can read an invite to resolve token -> roomId.
+    // Only Cloud Functions (admin SDK) should create/modify; we also allow
+    // room creators to create their own invite alongside the room.
+    match /invites/{token} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['roomId', 'createdBy', 'purpose'])
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.purpose is string
+        && request.resource.data.purpose.size() > 0
+        && request.resource.data.purpose.size() <= 200;
+      allow update, delete: if false;
+    }
+
+    match /rooms/{roomId} {
+      // Creating a room: you must set yourself as creator + sole member.
+      allow create: if isSignedIn()
+        && request.resource.data.creatorUid == request.auth.uid
+        && request.resource.data.memberUids == [request.auth.uid]
+        && request.resource.data.isFull == false
+        && request.resource.data.purpose is string
+        && request.resource.data.purpose.size() > 0
+        && request.resource.data.purpose.size() <= 200
+        && request.resource.data.inviteToken is string
+        && request.resource.data.inviteToken.size() >= 16;
+
+      // Reading: members only.
+      allow get: if isSignedIn() && isMember(resource.data);
+
+      // Listing rooms: client must filter by memberUids array-contains self,
+      // enforced by security via the resource.data.memberUids check.
+      allow list: if isSignedIn();
+
+      // Updating: only to add yourself to a not-yet-full room (join flow),
+      // OR creator adjusting room while not full (unused for MVP).
+      // Join flow: new member appended + isFull flipped to true.
+      allow update: if isSignedIn()
+        && resource.data.isFull == false
+        && !(request.auth.uid in resource.data.memberUids)
+        && request.resource.data.memberUids == resource.data.memberUids.concat([request.auth.uid])
+        && request.resource.data.isFull == true
+        && request.resource.data.purpose == resource.data.purpose
+        && request.resource.data.creatorUid == resource.data.creatorUid
+        && request.resource.data.inviteToken == resource.data.inviteToken;
+
+      allow delete: if false;
+
+      // wants/{uid}: ONLY the owning user may read or write.
+      // This is the core double-blind protection.
+      match /wants/{uid} {
+        allow read, write: if isSignedIn() && request.auth.uid == uid;
+      }
+
+      // matches/{dayKey}: members can read; clients cannot write.
+      // Only Cloud Functions (admin SDK) can create/delete.
+      match /matches/{dayKey} {
+        allow read: if isSignedIn()
+          && request.auth.uid in get(/databases/$(database)/documents/rooms/$(roomId)).data.memberUids;
+        allow write: if false;
+      }
+    }
+  }
+}

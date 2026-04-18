@@ -1,19 +1,38 @@
 'use client';
 
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+
 import RoomListLayout from '@/components/RoomListLayout';
 import RoomListItem from '@/components/RoomListItem';
-
-const mockRooms = [
-  {
-    id: 1,
-    name: "Room 1",
-  }
-];
+import { useRoomList } from '@/hooks/useRoomList';
 
 const RoomListContainer = () => {
+  const { rooms, loading } = useRoomList();
+
+  if (loading) {
+    return (
+      <Box p={2}>
+        <Typography variant="body2" color="text.secondary">
+          載入中...
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (rooms.length === 0) {
+    return (
+      <Box p={2}>
+        <Typography variant="body2" color="text.secondary">
+          還沒有 room。建立一個，把連結分享給朋友。
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <RoomListLayout>
-      {mockRooms.map((room) => (
+      {rooms.map((room) => (
         <RoomListItem key={room.id} room={room} />
       ))}
     </RoomListLayout>

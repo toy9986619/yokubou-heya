@@ -1,38 +1,40 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
-
-let firebaseApp = null;
-let firebaseDatabase = null;
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAYvF3CqjijqHlHCI_o7lGiIkyJB2RoGps",
-  authDomain: "yokubou-heya.firebaseapp.com",
-  projectId: "yokubou-heya",
-  storageBucket: "yokubou-heya.appspot.com",
-  messagingSenderId: "761094030774",
-  appId: "1:761094030774:web:2ade7eba6e456a37fb6d17",
-  measurementId: "G-TZLG64K8Y2",
-  databaseURL: "https://yokubou-heya-default-rtdb.firebaseio.com/",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-export const initFirebase = () => {
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
+let emulatorsWired = false;
 
-  firebaseApp = app;
-  firebaseDatabase = database;
+const wireEmulators = (auth, db) => {
+  if (emulatorsWired) return;
+  if (process.env.NEXT_PUBLIC_USE_EMULATOR !== '1') return;
+  if (typeof window === 'undefined') return;
+  connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+  connectFirestoreEmulator(db, '127.0.0.1', 8080);
+  emulatorsWired = true;
 };
 
-export const getFirebaseApp = () => {
-  if (!firebaseApp) {
-    throw new Error("Firebase app is not initialized");
-  }
-  return firebaseApp;
+export const getFirebaseApp = () => (getApps().length ? getApp() : initializeApp(firebaseConfig));
+
+export const getFirebaseAuth = () => {
+  const auth = getAuth(getFirebaseApp());
+  const db = getFirestore(getFirebaseApp());
+  wireEmulators(auth, db);
+  return auth;
 };
 
-export const getFirebaseDatabase = () => {
-  if (!firebaseDatabase) {
-    throw new Error("Firebase database is not initialized");
-  }
-  return firebaseDatabase;
-}
+export const getFirebaseDb = () => {
+  const db = getFirestore(getFirebaseApp());
+  const auth = getAuth(getFirebaseApp());
+  wireEmulators(auth, db);
+  return db;
+};

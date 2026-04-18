@@ -1,22 +1,21 @@
+import Link from 'next/link';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import Chip from '@mui/material/Chip';
 
 const RoomListItem = ({ room }) => {
+  const label = room.isFull ? '2/2' : '1/2';
   return (
-    <ListItem>
-      <ListItemButton>
-        <ListItemText primary= {room.name} />
+    <ListItem disablePadding secondaryAction={<Chip label={label} size="small" />}>
+      <ListItemButton component={Link} href={`/room?id=${room.id}`}>
+        <ListItemText
+          primary={room.purpose || '（未命名）'}
+          primaryTypographyProps={{ noWrap: true }}
+        />
       </ListItemButton>
     </ListItem>
   );
-};
-
-RoomListItem.defaultProps = {
-  room: {
-    id: 0,
-    name: "Room Name",
-  },
 };
 
 export default RoomListItem;
