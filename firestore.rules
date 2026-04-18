@@ -36,7 +36,12 @@ service cloud.firestore {
         && request.resource.data.purpose.size() > 0
         && request.resource.data.purpose.size() <= 200
         && request.resource.data.inviteToken is string
-        && request.resource.data.inviteToken.size() >= 16;
+        && request.resource.data.inviteToken.size() >= 16
+        && request.resource.data.memberDisplayNames is map
+        && request.resource.data.memberDisplayNames.keys().hasOnly([request.auth.uid])
+        && request.resource.data.memberDisplayNames[request.auth.uid] is string
+        && request.resource.data.memberDisplayNames[request.auth.uid].size() > 0
+        && request.resource.data.memberDisplayNames[request.auth.uid].size() <= 60;
 
       // Reading: members only.
       allow get: if isSignedIn() && isMember(resource.data);
@@ -46,9 +51,9 @@ service cloud.firestore {
       // must filter with where('memberUids', 'array-contains', auth.uid).
       allow list: if isSignedIn() && request.auth.uid in resource.data.memberUids;
 
-      // Updating: only to add yourself to a not-yet-full room (join flow),
-      // OR creator adjusting room while not full (unused for MVP).
-      // Join flow: new member appended + isFull flipped to true.
+      // Updating: only to add yourself to a not-yet-full room (join flow).
+      // Joiner also adds their own entry to memberDisplayNames without
+      // touching the creator's entry.
       allow update: if isSignedIn()
         && resource.data.isFull == false
         && !(request.auth.uid in resource.data.memberUids)
@@ -56,7 +61,11 @@ service cloud.firestore {
         && request.resource.data.isFull == true
         && request.resource.data.purpose == resource.data.purpose
         && request.resource.data.creatorUid == resource.data.creatorUid
-        && request.resource.data.inviteToken == resource.data.inviteToken;
+        && request.resource.data.inviteToken == resource.data.inviteToken
+        && request.resource.data.memberDisplayNames[request.auth.uid] is string
+        && request.resource.data.memberDisplayNames[request.auth.uid].size() > 0
+        && request.resource.data.memberDisplayNames[request.auth.uid].size() <= 60
+        && request.resource.data.memberDisplayNames[resource.data.creatorUid] == resource.data.memberDisplayNames[resource.data.creatorUid];
 
       allow delete: if isSignedIn() && request.auth.uid == resource.data.creatorUid;
 

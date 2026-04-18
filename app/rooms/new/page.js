@@ -77,9 +77,11 @@ export default function NewRoomPage() {
     try {
       const db = getFirebaseDb();
       const token = generateInviteToken();
+      const displayName = (user.displayName || user.email || '使用者').slice(0, 60);
       const roomData = {
         creatorUid: user.uid,
         memberUids: [user.uid],
+        memberDisplayNames: { [user.uid]: displayName },
         isFull: false,
         purpose: trimmed,
         inviteToken: token,

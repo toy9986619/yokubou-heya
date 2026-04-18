@@ -88,9 +88,11 @@ const JoinView = () => {
     setError(null);
     try {
       const db = getFirebaseDb();
+      const displayName = (user.displayName || user.email || '朋友').slice(0, 60);
       await updateDoc(doc(db, 'rooms', roomId), {
         memberUids: arrayUnion(user.uid),
         isFull: true,
+        [`memberDisplayNames.${user.uid}`]: displayName,
       });
       router.replace(`/room?id=${roomId}`);
     } catch (err) {

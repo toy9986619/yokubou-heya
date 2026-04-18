@@ -122,6 +122,8 @@ const RoomDetail = ({ roomId, onDeleted }) => {
   }
 
   const isCreator = room.creatorUid === user.uid;
+  const otherUid = (room.memberUids || []).find((uid) => uid !== user.uid);
+  const otherName = otherUid ? room.memberDisplayNames?.[otherUid] : null;
   const inviteLink =
     typeof window !== 'undefined'
       ? `${window.location.origin}/join?token=${room.inviteToken}`
@@ -184,7 +186,11 @@ const RoomDetail = ({ roomId, onDeleted }) => {
           </Typography>
           <Typography variant="h5">{room.purpose}</Typography>
           <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
-            <Chip size="small" label={room.isFull ? '成員 2/2' : '等待朋友加入（1/2）'} />
+            {room.isFull ? (
+              <Chip size="small" label={`與 ${otherName || '朋友'}`} />
+            ) : (
+              <Chip size="small" label="等待朋友加入（1/2）" />
+            )}
             {isCreator && <Chip size="small" label="你建立的" variant="outlined" />}
           </Box>
         </Box>
