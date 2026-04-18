@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -23,17 +23,66 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { getFirebaseDb } from '@/firebase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRoom } from '@/hooks/useRoom';
+import { useWant } from '@/hooks/useWant';
 import WantButton from '@/components/WantButton';
 import MatchBanner from '@/components/MatchBanner';
 
+const bindPromptStorageKey = (uid) => `yokubou:bind-prompt-shown:${uid}`;
+
 const RoomDetail = ({ roomId, onDeleted }) => {
-  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, isAnonymous, upgradeAnonymousToGoogle } =
+    useAuth();
   const { room, loading: roomLoading, error } = useRoom(roomId);
+  const { isWantingToday } = useWant(roomId);
+
   const [copied, setCopied] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
+
+  const [bindSnackOpen, setBindSnackOpen] = useState(false);
+  const [bindError, setBindError] = useState(null);
+  const [binding, setBinding] = useState(false);
+  const prevWantingRef = useRef(false);
+
+  // Show a Snackbar the first time an anonymous user's want flips to true.
+  // Flag is per-uid in localStorage so we don't nag after they've seen it.
+  useEffect(() => {
+    if (!user || !isAnonymous) return;
+    if (!isWantingToday) {
+      prevWantingRef.current = false;
+      return;
+    }
+    if (prevWantingRef.current) return;
+    prevWantingRef.current = true;
+    if (typeof window === 'undefined') return;
+    const key = bindPromptStorageKey(user.uid);
+    if (window.localStorage.getItem(key) === '1') return;
+    setBindSnackOpen(true);
+    window.localStorage.setItem(key, '1');
+  }, [isWantingToday, isAnonymous, user]);
+
+  const handleUpgrade = async () => {
+    setBindError(null);
+    setBinding(true);
+    try {
+      await upgradeAnonymousToGoogle();
+      setBindSnackOpen(false);
+    } catch (err) {
+      console.error(err);
+      const code = err && err.code;
+      const message =
+        code === 'auth/credential-already-in-use'
+          ? '這個 Google 帳號已經綁過其他使用者。請改用其他 Google 帳號，或直接登出換成該帳號。'
+          : code === 'auth/popup-closed-by-user'
+            ? null
+            : err.message || '綁定失敗';
+      if (message) setBindError(message);
+    } finally {
+      setBinding(false);
+    }
+  };
 
   if (authLoading || roomLoading) {
     return (
@@ -103,12 +152,31 @@ const RoomDetail = ({ roomId, onDeleted }) => {
         p: 4,
         display: 'flex',
         flexDirection: 'column',
-        gap: 4,
+        gap: 3,
         maxWidth: 600,
         mx: 'auto',
         width: '100%',
       }}
     >
+      {isAnonymous && (
+        <Alert
+          severity="warning"
+          variant="outlined"
+          action={
+            <Button color="inherit" size="small" onClick={handleUpgrade} disabled={binding}>
+              {binding ? '綁定中...' : '綁定 Google'}
+            </Button>
+          }
+        >
+          你目前是訪客模式。清除瀏覽器資料或換裝置會失去這個 room 的存取權。
+        </Alert>
+      )}
+      {bindError && (
+        <Alert severity="error" onClose={() => setBindError(null)}>
+          {bindError}
+        </Alert>
+      )}
+
       <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography variant="overline" color="text.secondary">
@@ -222,6 +290,25 @@ const RoomDetail = ({ roomId, onDeleted }) => {
         onClose={() => setCopied(false)}
         message="已複製邀請連結"
       />
+
+      <Snackbar
+        open={bindSnackOpen}
+        autoHideDuration={10000}
+        onClose={() => setBindSnackOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          severity="info"
+          onClose={() => setBindSnackOpen(false)}
+          action={
+            <Button color="inherit" size="small" onClick={handleUpgrade} disabled={binding}>
+              {binding ? '綁定中...' : '綁定'}
+            </Button>
+          }
+        >
+          已記錄你的「想要」。綁定 Google 帳號可以換裝置也能看到這個 room。
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
