@@ -8,6 +8,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 import { AuthProvider } from '@/contexts/AuthContext';
+import AppThemeProvider from '@/contexts/AppThemeProvider';
 import AuthToolbarControl from '@/components/AuthToolbarControl';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,27 +22,29 @@ export default function RootLayout({ children }) {
   return (
     <html lang="zh-Hant">
       <body className={inter.className}>
-        <AuthProvider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <Box>
-              <AppBar position="static">
-                <Toolbar>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <Typography variant="h6">{metadata.title}</Typography>
-                    </Link>
-                  </Box>
-                  <AuthToolbarControl />
-                </Toolbar>
-              </AppBar>
-            </Box>
-            <Box sx={{ display: 'flex', flex: 1 }}>
-              <Box sx={{ flex: 1, height: '100%' }}>
-                {children}
+        <AppThemeProvider>
+          <AuthProvider>
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <Box>
+                <AppBar position="static">
+                  <Toolbar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Typography variant="h6">{metadata.title}</Typography>
+                      </Link>
+                    </Box>
+                    <AuthToolbarControl />
+                  </Toolbar>
+                </AppBar>
+              </Box>
+              <Box sx={{ display: 'flex', flex: 1 }}>
+                <Box sx={{ flex: 1, height: '100%' }}>
+                  {children}
+                </Box>
               </Box>
             </Box>
-          </Box>
-        </AuthProvider>
+          </AuthProvider>
+        </AppThemeProvider>
       </body>
     </html>
   );
