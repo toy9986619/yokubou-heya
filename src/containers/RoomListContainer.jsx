@@ -7,7 +7,7 @@ import RoomListLayout from '@/components/RoomListLayout';
 import RoomListItem from '@/components/RoomListItem';
 import { useRoomList } from '@/hooks/useRoomList';
 
-const RoomListContainer = () => {
+const RoomListContainer = ({ selectedRoomId }) => {
   const { rooms, loading } = useRoomList();
 
   if (loading) {
@@ -33,7 +33,11 @@ const RoomListContainer = () => {
   return (
     <RoomListLayout>
       {rooms.map((room) => (
-        <RoomListItem key={room.id} room={room} />
+        <RoomListItem
+          key={room.id}
+          room={room}
+          selected={room.id === selectedRoomId}
+        />
       ))}
     </RoomListLayout>
   );

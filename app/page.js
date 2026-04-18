@@ -1,16 +1,26 @@
 'use client';
 
+import { Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 
 import { useAuth } from '@/contexts/AuthContext';
 import RoomListContainer from '@/containers/RoomListContainer';
+import RoomDetail from '@/containers/RoomDetail';
 
-export default function Home() {
+const HomeView = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedRoomId = searchParams.get('id');
   const { user, loading, signInWithGoogle } = useAuth();
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
   if (loading) {
     return (
@@ -50,12 +60,12 @@ export default function Home() {
     <Box sx={{ display: 'flex', height: '100%' }}>
       <Box
         sx={{
-          width: '100%',
-          maxWidth: 360,
-          borderRight: 1,
+          width: { xs: '100%', md: 360 },
+          borderRight: { xs: 0, md: 1 },
           borderColor: 'divider',
           display: 'flex',
           flexDirection: 'column',
+          minHeight: 0,
         }}
       >
         <Box sx={{ p: 2 }}>
@@ -70,20 +80,53 @@ export default function Home() {
           </Button>
         </Box>
         <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
-          <RoomListContainer />
+          <RoomListContainer selectedRoomId={selectedRoomId} />
         </Box>
       </Box>
-      <Box
-        sx={{
-          flex: 1,
-          minWidth: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Typography color="text.secondary">從左側選擇一個 Room，或建立新的</Typography>
-      </Box>
+      {isDesktop && (
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            overflowY: 'auto',
+          }}
+        >
+          {selectedRoomId ? (
+            <RoomDetail
+              roomId={selectedRoomId}
+              onDeleted={() => router.replace('/', { scroll: false })}
+            />
+          ) : (
+            <Box
+              sx={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography color="text.secondary">從左側選擇一個 Room，或建立新的</Typography>
+            </Box>
+          )}
+        </Box>
+      )}
     </Box>
+  );
+};
+
+export default function Home() {
+  return (
+    <Suspense
+      fallback={
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
+        >
+          <Typography color="text.secondary">載入中...</Typography>
+        </Box>
+      }
+    >
+      <HomeView />
+    </Suspense>
   );
 }

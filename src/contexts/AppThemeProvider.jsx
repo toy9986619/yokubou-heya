@@ -6,7 +6,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const AppThemeProvider = ({ children }) => {
-  const prefersDark = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true });
+  // Don't pass noSsr — it forces reading matchMedia on first client render,
+  // which mismatches the SSR default (false) and triggers hydration warnings.
+  // Default behavior keeps SSR/first-client render consistent, then the
+  // post-mount effect updates to the real value (brief light-mode flash).
+  const prefersDark = useMediaQuery('(prefers-color-scheme: dark)');
 
   const theme = useMemo(
     () =>

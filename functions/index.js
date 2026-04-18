@@ -1,4 +1,4 @@
-const { onDocumentWritten } = require('firebase-functions/v2/firestore');
+const { onDocumentDeleted, onDocumentWritten } = require('firebase-functions/v2/firestore');
 const { initializeApp } = require('firebase-admin/app');
 const { FieldValue, getFirestore } = require('firebase-admin/firestore');
 
@@ -60,3 +60,30 @@ exports.onWantWrite = onDocumentWritten(
     }
   },
 );
+
+/**
+ * Fires when a room doc is deleted. Cleans up owned data that the client
+ * can't atomically remove through security rules:
+ *   - rooms/{roomId}/wants/*
+ *   - rooms/{roomId}/matches/*
+ *   - invites/{inviteToken}
+ */
+exports.onRoomDeleted = onDocumentDeleted('rooms/{roomId}', async (event) => {
+  const { roomId } = event.params;
+  const roomData = event.data && event.data.data();
+  if (!roomData) return;
+
+  const roomRef = db.collection('rooms').doc(roomId);
+  const [wantsSnap, matchesSnap] = await Promise.all([
+    roomRef.collection('wants').get(),
+    roomRef.collection('matches').get(),
+  ]);
+
+  const batch = db.batch();
+  wantsSnap.docs.forEach((d) => batch.delete(d.ref));
+  matchesSnap.docs.forEach((d) => batch.delete(d.ref));
+  if (roomData.inviteToken) {
+    batch.delete(db.collection('invites').doc(roomData.inviteToken));
+  }
+  await batch.commit();
+});

@@ -58,7 +58,7 @@ service cloud.firestore {
         && request.resource.data.creatorUid == resource.data.creatorUid
         && request.resource.data.inviteToken == resource.data.inviteToken;
 
-      allow delete: if false;
+      allow delete: if isSignedIn() && request.auth.uid == resource.data.creatorUid;
 
       // wants/{uid}: ONLY the owning user may read or write.
       // This is the core double-blind protection.
