@@ -24,7 +24,7 @@ const JoinView = () => {
   const token = searchParams.get('token');
   const { user, loading: authLoading, signInAsAnonymous } = useAuth();
 
-  const [phase, setPhase] = useState('resolving'); // resolving | need-name | confirm | joining | error
+  const [phase, setPhase] = useState('resolving');
   const [roomId, setRoomId] = useState(null);
   const [roomPurpose, setRoomPurpose] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -94,9 +94,6 @@ const JoinView = () => {
       });
       router.replace(`/room?id=${roomId}`);
     } catch (err) {
-      // Permission-denied can mean: already a member, room full, or other rules violation.
-      // Try redirecting to the room page — if already a member, they'll see it; otherwise
-      // they'll get a clearer "找不到 room" there.
       if (err instanceof FirebaseError && err.code === 'permission-denied') {
         router.replace(`/room?id=${roomId}`);
         return;
@@ -109,19 +106,32 @@ const JoinView = () => {
 
   if (phase === 'need-name') {
     return (
-      <Box p={4} maxWidth={500} mx="auto" display="flex" flexDirection="column" gap={2}>
+      <Box
+        sx={{
+          p: 4,
+          maxWidth: 500,
+          mx: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <Typography variant="h5">加入 Room</Typography>
         <Typography variant="body2" color="text.secondary">
           填一個名字讓朋友認得你。不需要 Google 登入就能加入，之後可以再綁定帳號。
         </Typography>
-        <Box component="form" onSubmit={handleAnonSignIn} display="flex" flexDirection="column" gap={2}>
+        <Box
+          component="form"
+          onSubmit={handleAnonSignIn}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
           <TextField
             label="顯示名稱"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             autoFocus
             fullWidth
-            inputProps={{ maxLength: 40 }}
+            slotProps={{ htmlInput: { maxLength: 40 } }}
           />
           {error && <Alert severity="error">{error}</Alert>}
           <Button type="submit" variant="contained">
@@ -134,7 +144,16 @@ const JoinView = () => {
 
   if (phase === 'confirm') {
     return (
-      <Box p={4} maxWidth={500} mx="auto" display="flex" flexDirection="column" gap={2}>
+      <Box
+        sx={{
+          p: 4,
+          maxWidth: 500,
+          mx: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <Typography variant="h5">加入這個 Room？</Typography>
         <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
           <Typography variant="overline" color="text.secondary">
@@ -143,7 +162,7 @@ const JoinView = () => {
           <Typography variant="body1">{roomPurpose || '（未命名）'}</Typography>
         </Box>
         {error && <Alert severity="error">{error}</Alert>}
-        <Box display="flex" gap={2}>
+        <Box sx={{ display: 'flex', gap: 2 }}>
           <Button variant="contained" onClick={handleConfirmJoin}>
             加入
           </Button>
@@ -155,7 +174,16 @@ const JoinView = () => {
 
   if (phase === 'error') {
     return (
-      <Box p={4} maxWidth={500} mx="auto" display="flex" flexDirection="column" gap={2}>
+      <Box
+        sx={{
+          p: 4,
+          maxWidth: 500,
+          mx: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+        }}
+      >
         <Alert severity="error">{error}</Alert>
         <Button onClick={() => router.push('/')}>回到首頁</Button>
       </Box>
@@ -163,7 +191,7 @@ const JoinView = () => {
   }
 
   return (
-    <Box p={4} maxWidth={500} mx="auto">
+    <Box sx={{ p: 4, maxWidth: 500, mx: 'auto' }}>
       <Typography color="text.secondary">
         {phase === 'joining' ? `正在加入「${roomPurpose}」...` : '處理中...'}
       </Typography>
@@ -173,7 +201,13 @@ const JoinView = () => {
 
 export default function JoinPage() {
   return (
-    <Suspense fallback={<Box p={4}><Typography color="text.secondary">載入中...</Typography></Box>}>
+    <Suspense
+      fallback={
+        <Box sx={{ p: 4 }}>
+          <Typography color="text.secondary">載入中...</Typography>
+        </Box>
+      }
+    >
       <JoinView />
     </Suspense>
   );

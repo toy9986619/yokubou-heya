@@ -14,7 +14,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <Box display="flex" alignItems="center" justifyContent="center" height="100%">
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
         <Typography color="text.secondary">載入中...</Typography>
       </Box>
     );
@@ -23,17 +23,19 @@ export default function Home() {
   if (!user) {
     return (
       <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        height="100%"
-        gap={3}
-        p={4}
-        textAlign="center"
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          gap: 3,
+          p: 4,
+          textAlign: 'center',
+        }}
       >
         <Typography variant="h4">欲望部屋</Typography>
-        <Typography variant="body1" color="text.secondary" maxWidth={420}>
+        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 420 }}>
           跟朋友各自偷偷表達「今天想要一起做某件事」。只有雙方都按下，系統才會同時通知你們。
           對方看不到你的狀態，你也看不到他的——直到達成的那一刻。
         </Typography>
@@ -45,16 +47,18 @@ export default function Home() {
   }
 
   return (
-    <Box display="flex" height="100%">
+    <Box sx={{ display: 'flex', height: '100%' }}>
       <Box
-        width="100%"
-        maxWidth={360}
-        borderRight={1}
-        borderColor="divider"
-        display="flex"
-        flexDirection="column"
+        sx={{
+          width: '100%',
+          maxWidth: 360,
+          borderRight: 1,
+          borderColor: 'divider',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
       >
-        <Box p={2}>
+        <Box sx={{ p: 2 }}>
           <Button
             component={Link}
             href="/rooms/new"
@@ -65,11 +69,19 @@ export default function Home() {
             建立新 Room
           </Button>
         </Box>
-        <Box flex={1} minHeight={0} sx={{ overflowY: 'auto' }}>
+        <Box sx={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
           <RoomListContainer />
         </Box>
       </Box>
-      <Box flex={1} minWidth={0} display="flex" alignItems="center" justifyContent="center">
+      <Box
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <Typography color="text.secondary">從左側選擇一個 Room，或建立新的</Typography>
       </Box>
     </Box>

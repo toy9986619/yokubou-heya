@@ -22,11 +22,11 @@ export default function RootLayout({ children }) {
     <html lang="zh-Hant">
       <body className={inter.className}>
         <AuthProvider>
-          <Box display="flex" flexDirection="column" height="100%">
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Box>
               <AppBar position="static">
                 <Toolbar>
-                  <Box flexGrow={1}>
+                  <Box sx={{ flexGrow: 1 }}>
                     <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
                       <Typography variant="h6">{metadata.title}</Typography>
                     </Link>
@@ -35,8 +35,8 @@ export default function RootLayout({ children }) {
                 </Toolbar>
               </AppBar>
             </Box>
-            <Box display="flex" flex={1}>
-              <Box flex={1} height="100%">
+            <Box sx={{ display: 'flex', flex: 1 }}>
+              <Box sx={{ flex: 1, height: '100%' }}>
                 {children}
               </Box>
             </Box>

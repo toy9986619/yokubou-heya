@@ -47,6 +47,10 @@ functions/firebase-debug.log*
 # vercel
 .vercel
 
+# Playwright MCP
+.playwright-mcp/
+*.png
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

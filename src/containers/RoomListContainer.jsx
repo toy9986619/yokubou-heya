@@ -12,7 +12,7 @@ const RoomListContainer = () => {
 
   if (loading) {
     return (
-      <Box p={2}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="body2" color="text.secondary">
           載入中...
         </Typography>
@@ -22,7 +22,7 @@ const RoomListContainer = () => {
 
   if (rooms.length === 0) {
     return (
-      <Box p={2}>
+      <Box sx={{ p: 2 }}>
         <Typography variant="body2" color="text.secondary">
           還沒有 room。建立一個，把連結分享給朋友。
         </Typography>

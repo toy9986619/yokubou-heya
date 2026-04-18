@@ -25,7 +25,7 @@ const RoomView = () => {
 
   if (authLoading || roomLoading) {
     return (
-      <Box p={4}>
+      <Box sx={{ p: 4 }}>
         <Typography color="text.secondary">載入中...</Typography>
       </Box>
     );
@@ -33,7 +33,7 @@ const RoomView = () => {
 
   if (!roomId) {
     return (
-      <Box p={4}>
+      <Box sx={{ p: 4 }}>
         <Alert severity="error">缺少 room 參數</Alert>
       </Box>
     );
@@ -41,7 +41,9 @@ const RoomView = () => {
 
   if (!user) {
     return (
-      <Box p={4} display="flex" flexDirection="column" gap={2} alignItems="flex-start">
+      <Box
+        sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-start' }}
+      >
         <Typography>請先登入以查看此 room。</Typography>
         <Button variant="contained" onClick={signInWithGoogle}>
           以 Google 登入
@@ -52,14 +54,13 @@ const RoomView = () => {
 
   if (error || !room) {
     return (
-      <Box p={4}>
+      <Box sx={{ p: 4 }}>
         <Alert severity="error">找不到此 room，或你不是成員</Alert>
       </Box>
     );
   }
 
   const isCreator = room.creatorUid === user.uid;
-  const otherMember = (room.memberUids || []).find((uid) => uid !== user.uid);
   const inviteLink =
     typeof window !== 'undefined'
       ? `${window.location.origin}/join?token=${room.inviteToken}`
@@ -71,13 +72,22 @@ const RoomView = () => {
   };
 
   return (
-    <Box p={4} display="flex" flexDirection="column" gap={4} maxWidth={600} mx="auto">
+    <Box
+      sx={{
+        p: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 4,
+        maxWidth: 600,
+        mx: 'auto',
+      }}
+    >
       <Box>
         <Typography variant="overline" color="text.secondary">
           Room
         </Typography>
         <Typography variant="h5">{room.purpose}</Typography>
-        <Box display="flex" gap={1} mt={1}>
+        <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
           <Chip size="small" label={room.isFull ? '成員 2/2' : '等待朋友加入（1/2）'} />
           {isCreator && <Chip size="small" label="你建立的" variant="outlined" />}
         </Box>
@@ -117,7 +127,7 @@ const RoomView = () => {
 
       {room.isFull && (
         <>
-          <Box display="flex" justifyContent="center" py={2}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
             <WantButton roomId={room.id} />
           </Box>
           <MatchBanner roomId={room.id} />
@@ -140,7 +150,13 @@ const RoomView = () => {
 
 export default function RoomPage() {
   return (
-    <Suspense fallback={<Box p={4}><Typography color="text.secondary">載入中...</Typography></Box>}>
+    <Suspense
+      fallback={
+        <Box sx={{ p: 4 }}>
+          <Typography color="text.secondary">載入中...</Typography>
+        </Box>
+      }
+    >
       <RoomView />
     </Suspense>
   );

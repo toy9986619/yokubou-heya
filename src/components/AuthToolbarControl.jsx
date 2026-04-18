@@ -33,7 +33,7 @@ const AuthToolbarControl = () => {
   const displayName = user.displayName || (isAnonymous ? '訪客' : user.email || '使用者');
 
   return (
-    <Box display="flex" alignItems="center" gap={1}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
       {isAnonymous && (
         <Typography variant="caption" sx={{ color: 'warning.light' }}>
           訪客模式

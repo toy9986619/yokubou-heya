@@ -28,7 +28,7 @@ export default function NewRoomPage() {
 
   if (authLoading) {
     return (
-      <Box p={4}>
+      <Box sx={{ p: 4 }}>
         <Typography color="text.secondary">載入中...</Typography>
       </Box>
     );
@@ -36,7 +36,15 @@ export default function NewRoomPage() {
 
   if (!user) {
     return (
-      <Box p={4} display="flex" flexDirection="column" gap={2} alignItems="flex-start">
+      <Box
+        sx={{
+          p: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 2,
+          alignItems: 'flex-start',
+        }}
+      >
         <Typography>建立 room 需要先以 Google 登入。</Typography>
         <Button variant="contained" onClick={signInWithGoogle}>
           以 Google 登入
@@ -47,7 +55,7 @@ export default function NewRoomPage() {
 
   if (user.isAnonymous) {
     return (
-      <Box p={4}>
+      <Box sx={{ p: 4 }}>
         <Alert severity="warning">訪客無法建立 room，請先綁定 Google 帳號（畫面右上角選單）。</Alert>
       </Box>
     );
@@ -94,14 +102,18 @@ export default function NewRoomPage() {
   };
 
   return (
-    <Box p={4} maxWidth={500}>
+    <Box sx={{ p: 4, maxWidth: 500 }}>
       <Typography variant="h5" gutterBottom>
         建立新 Room
       </Typography>
-      <Typography variant="body2" color="text.secondary" mb={3}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         填寫你想跟朋友一起做的事。建立後會拿到一條邀請連結。
       </Typography>
-      <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+      >
         <TextField
           label="用途"
           placeholder="例如：一起看電影、一起去吃那家店"
@@ -112,11 +124,11 @@ export default function NewRoomPage() {
           multiline
           minRows={2}
           maxRows={5}
-          inputProps={{ maxLength: 200 }}
+          slotProps={{ htmlInput: { maxLength: 200 } }}
           helperText={`${purpose.length} / 200`}
         />
         {error && <Alert severity="error">{error}</Alert>}
-        <Box display="flex" gap={2}>
+        <Box sx={{ display: 'flex', gap: 2 }}>
           <Button type="submit" variant="contained" disabled={submitting}>
             {submitting ? '建立中...' : '建立'}
           </Button>

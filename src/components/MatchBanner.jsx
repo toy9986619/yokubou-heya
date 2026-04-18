@@ -11,10 +11,8 @@ const MatchBanner = ({ roomId }) => {
 
   if (loading) return null;
 
-  const history = matches.filter((m) => !matchedToday || m.dayKey !== matches[0]?.dayKey);
-
   return (
-    <Box display="flex" flexDirection="column" gap={2} width="100%">
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
       {matchedToday ? (
         <Alert severity="success" sx={{ fontSize: '1.1rem' }}>
           🎉 今天你們達成了！去做吧
