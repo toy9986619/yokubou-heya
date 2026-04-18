@@ -41,9 +41,10 @@ service cloud.firestore {
       // Reading: members only.
       allow get: if isSignedIn() && isMember(resource.data);
 
-      // Listing rooms: client must filter by memberUids array-contains self,
-      // enforced by security via the resource.data.memberUids check.
-      allow list: if isSignedIn();
+      // Listing rooms: rule evaluates per matched document, so Firestore will
+      // reject any query whose constraints don't guarantee membership. Client
+      // must filter with where('memberUids', 'array-contains', auth.uid).
+      allow list: if isSignedIn() && request.auth.uid in resource.data.memberUids;
 
       // Updating: only to add yourself to a not-yet-full room (join flow),
       // OR creator adjusting room while not full (unused for MVP).
